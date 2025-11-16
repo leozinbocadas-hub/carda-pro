@@ -19,6 +19,9 @@ import Categorias from "./pages/dashboard/cliente/Categorias";
 import Configuracoes from "./pages/dashboard/cliente/Configuracoes";
 import Entregadores from "./pages/dashboard/cliente/Entregadores";
 import Plano from "./pages/dashboard/cliente/Plano";
+import AdminDashboard from "./pages/dashboard/admin/AdminDashboard";
+import EntregadorLogin from "./pages/dashboard/entregador/EntregadorLogin";
+import EntregadorDashboard from "./pages/dashboard/entregador/EntregadorDashboard";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +50,13 @@ const App = () => (
             <Route path="plano" element={<Plano />} />
             <Route path="configuracoes" element={<Configuracoes />} />
           </Route>
+
+          {/* Admin Dashboard */}
+          <Route path="/dashboard/admin" element={<AdminDashboard />} />
+
+          {/* Entregador Routes */}
+          <Route path="/entregador/login" element={<EntregadorLogin />} />
+          <Route path="/entregador/dashboard" element={<EntregadorDashboard />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

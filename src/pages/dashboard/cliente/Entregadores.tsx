@@ -65,6 +65,8 @@ const Entregadores = () => {
     telefone: "",
     veiculo: "Moto",
     placa: "",
+    email: "",
+    senha: "",
   });
 
   const getStatusBadge = (status: Entregador["status"]) => {
@@ -106,7 +108,7 @@ const Entregadores = () => {
 
     setIsDialogOpen(false);
     setEditingId(null);
-    setFormData({ nome: "", cpf: "", telefone: "", veiculo: "Moto", placa: "" });
+    setFormData({ nome: "", cpf: "", telefone: "", veiculo: "Moto", placa: "", email: "", senha: "" });
   };
 
   const handleEdit = (entregador: Entregador) => {
@@ -117,6 +119,8 @@ const Entregadores = () => {
       telefone: entregador.telefone,
       veiculo: entregador.veiculo,
       placa: entregador.placa,
+      email: "",
+      senha: "",
     });
     setIsDialogOpen(true);
   };
@@ -133,7 +137,7 @@ const Entregadores = () => {
   const handleDialogClose = () => {
     setIsDialogOpen(false);
     setEditingId(null);
-    setFormData({ nome: "", cpf: "", telefone: "", veiculo: "Moto", placa: "" });
+    setFormData({ nome: "", cpf: "", telefone: "", veiculo: "Moto", placa: "", email: "", senha: "" });
   };
 
   return (
@@ -230,6 +234,32 @@ const Entregadores = () => {
                     placeholder="ABC-1234"
                     value={formData.placa}
                     onChange={(e) => setFormData({ ...formData, placa: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email * (Para Login)</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="entregador@email.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required={!editingId}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="senha">
+                    Senha * {editingId && "(deixe em branco para manter)"}
+                  </Label>
+                  <Input
+                    id="senha"
+                    type="password"
+                    placeholder="••••••••"
+                    value={formData.senha}
+                    onChange={(e) => setFormData({ ...formData, senha: e.target.value })}
+                    required={!editingId}
                   />
                 </div>
               </div>
