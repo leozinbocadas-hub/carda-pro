@@ -3,9 +3,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import Auth from "./pages/Auth";
 import LandingPage from "./pages/LandingPage";
-import Login from "./pages/Login";
-import Cadastro from "./pages/Cadastro";
+import Index from "./pages/Index";
 import Cardapio from "./pages/Cardapio";
 import Checkout from "./pages/Checkout";
 import PedidoConfirmado from "./pages/PedidoConfirmado";
@@ -20,7 +21,6 @@ import Configuracoes from "./pages/dashboard/cliente/Configuracoes";
 import Entregadores from "./pages/dashboard/cliente/Entregadores";
 import Plano from "./pages/dashboard/cliente/Plano";
 import AdminDashboard from "./pages/dashboard/admin/AdminDashboard";
-import EntregadorLogin from "./pages/dashboard/entregador/EntregadorLogin";
 import EntregadorDashboard from "./pages/dashboard/entregador/EntregadorDashboard";
 
 const queryClient = new QueryClient();
@@ -31,36 +31,36 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/cadastro" element={<Cadastro />} />
-          <Route path="/cardapio" element={<Cardapio />} />
-          <Route path="/meus-pedidos" element={<MeusPedidos />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/pedido-confirmado" element={<PedidoConfirmado />} />
-          
-          {/* Dashboard Routes */}
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route index element={<DashboardHome />} />
-            <Route path="produtos" element={<Produtos />} />
-            <Route path="pedidos" element={<Pedidos />} />
-            <Route path="categorias" element={<Categorias />} />
-            <Route path="entregadores" element={<Entregadores />} />
-            <Route path="plano" element={<Plano />} />
-            <Route path="configuracoes" element={<Configuracoes />} />
-          </Route>
-
-          {/* Admin Dashboard */}
-          <Route path="/dashboard/admin" element={<AdminDashboard />} />
-
-          {/* Entregador Routes */}
-          <Route path="/entregador/login" element={<EntregadorLogin />} />
-          <Route path="/entregador/dashboard" element={<EntregadorDashboard />} />
-          
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/login" element={<Auth />} />
+            <Route path="/cardapio" element={<Index />} />
+            <Route path="/meus-pedidos" element={<MeusPedidos />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/pedido-confirmado" element={<PedidoConfirmado />} />
+            
+            {/* Dashboard Cliente */}
+            <Route path="/dashboard" element={<DashboardLayout />}>
+              <Route index element={<DashboardHome />} />
+              <Route path="produtos" element={<Produtos />} />
+              <Route path="pedidos" element={<Pedidos />} />
+              <Route path="categorias" element={<Categorias />} />
+              <Route path="entregadores" element={<Entregadores />} />
+              <Route path="plano" element={<Plano />} />
+              <Route path="configuracoes" element={<Configuracoes />} />
+            </Route>
+            
+            {/* Dashboard Admin */}
+            <Route path="/dashboard/admin" element={<AdminDashboard />} />
+            
+            {/* Dashboard Entregador */}
+            <Route path="/entregador/dashboard" element={<EntregadorDashboard />} />
+            
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
