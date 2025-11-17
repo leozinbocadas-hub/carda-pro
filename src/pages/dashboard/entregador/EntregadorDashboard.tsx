@@ -7,6 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
 import {
   Bike,
   LogOut,
@@ -17,8 +19,21 @@ import {
   DollarSign,
   Package,
   Navigation,
+  User,
+  TrendingUp,
+  Star,
+  Zap,
+  AlertCircle,
+  Timer,
+  Target,
+  Award,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
 
 interface Pedido {
   id: string;
@@ -163,122 +178,253 @@ const EntregadorDashboard = () => {
 
   const totalEntregasHoje = entregasHoje.length;
   const totalArrecadadoHoje = entregasHoje.reduce((acc, e) => acc + e.valor, 0);
+  const mediaEntregaDia = totalArrecadadoHoje / (totalEntregasHoje || 1);
+  const metaDiaria = 10;
+  const progressoMeta = (totalEntregasHoje / metaDiaria) * 100;
+  const tempoMedioEntrega = 25; // minutos
+  const avaliacaoMedia = 4.8;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header Mobile-First */}
-      <header className="sticky top-0 z-50 bg-card border-b">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      {/* Header Mobile-First Melhorado */}
+      <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-lg border-b shadow-lg">
         <div className="container max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                <Bike className="w-6 h-6 text-primary-foreground" />
+              <div className="relative">
+                <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center shadow-lg">
+                  <Bike className="w-7 h-7 text-primary-foreground" />
+                </div>
+                {disponivel && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-card animate-pulse" />
+                )}
               </div>
               <div>
-                <h1 className="font-bold text-lg">Portal Entregador</h1>
-                <p className="text-xs text-muted-foreground">João Entregador</p>
+                <h1 className="font-bold text-lg">João Entregador</h1>
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
+                  {avaliacaoMedia} • {totalEntregasHoje} entregas hoje
+                </p>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={handleLogout}>
+            <Button variant="ghost" size="icon" onClick={handleLogout} className="rounded-full">
               <LogOut className="w-5 h-5" />
             </Button>
           </div>
 
-          {/* Status Toggle */}
-          <div className="mt-4 flex items-center justify-between p-4 bg-muted rounded-lg">
-            <div className="flex items-center gap-2">
-              <div className={`w-3 h-3 rounded-full ${disponivel ? "bg-green-500" : "bg-red-500"} animate-pulse`} />
-              <Label htmlFor="status" className="font-medium">
-                {disponivel ? "Disponível para Entregas" : "Indisponível"}
-              </Label>
+          {/* Status Toggle Melhorado */}
+          <div className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-300 ${
+            disponivel 
+              ? "bg-green-500/10 border-green-500/30" 
+              : "bg-red-500/10 border-red-500/30"
+          }`}>
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                disponivel ? "bg-green-500/20" : "bg-red-500/20"
+              }`}>
+                <div className={`w-3 h-3 rounded-full ${
+                  disponivel ? "bg-green-500 animate-pulse" : "bg-red-500"
+                }`} />
+              </div>
+              <div>
+                <Label htmlFor="status" className="font-semibold text-base cursor-pointer">
+                  {disponivel ? "Disponível para Entregas" : "Indisponível"}
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  {disponivel ? "Recebendo novos pedidos" : "Não recebendo pedidos"}
+                </p>
+              </div>
             </div>
             <Switch
               id="status"
               checked={disponivel}
               onCheckedChange={setDisponivel}
+              className="data-[state=checked]:bg-green-500"
             />
           </div>
         </div>
       </header>
 
       <main className="container max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {/* Estatísticas do Dia */}
+        {/* Meta do Dia */}
+        {disponivel && (
+          <Alert className="border-primary/50 bg-primary/5 animate-fade-in">
+            <Target className="h-4 w-4 text-primary" />
+            <AlertTitle className="text-primary font-semibold">Meta do Dia</AlertTitle>
+            <AlertDescription>
+              <div className="mt-2 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>{totalEntregasHoje} de {metaDiaria} entregas</span>
+                  <span className="font-semibold">{progressoMeta.toFixed(0)}%</span>
+                </div>
+                <Progress value={progressoMeta} className="h-2" />
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Estatísticas Melhoradas */}
         <div className="grid grid-cols-2 gap-4">
-          <Card>
+          <Card className="border-none shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-blue-500/5 animate-fade-in">
             <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-primary/10 rounded-full">
-                  <Package className="w-5 h-5 text-primary" />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="p-3 bg-blue-500/10 rounded-xl">
+                    <Package className="w-6 h-6 text-blue-600" />
+                  </div>
+                  {progressoMeta >= 100 && (
+                    <Badge variant="default" className="gap-1 bg-green-600">
+                      <Award className="w-3 h-3" />
+                      Meta!
+                    </Badge>
+                  )}
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Entregas Hoje</p>
-                  <p className="text-2xl font-bold">{totalEntregasHoje}</p>
+                  <p className="text-3xl font-bold mt-1">{totalEntregasHoje}</p>
+                </div>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <TrendingUp className="w-3 h-3" />
+                  <span>+2 vs ontem</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-none shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-green-500/5 animate-fade-in [animation-delay:100ms]">
             <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-green-500/10 rounded-full">
-                  <DollarSign className="w-5 h-5 text-green-600" />
+              <div className="space-y-3">
+                <div className="p-3 bg-green-500/10 rounded-xl w-fit">
+                  <DollarSign className="w-6 h-6 text-green-600" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Arrecadado</p>
-                  <p className="text-2xl font-bold">R$ {totalArrecadadoHoje.toFixed(2)}</p>
+                  <p className="text-3xl font-bold mt-1 text-green-600">
+                    R$ {totalArrecadadoHoje.toFixed(2)}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <DollarSign className="w-3 h-3" />
+                  <span>R$ {mediaEntregaDia.toFixed(2)} média</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-purple-500/5 animate-fade-in [animation-delay:200ms]">
+            <CardContent className="pt-6">
+              <div className="space-y-3">
+                <div className="p-3 bg-purple-500/10 rounded-xl w-fit">
+                  <Timer className="w-6 h-6 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Tempo Médio</p>
+                  <p className="text-3xl font-bold mt-1">{tempoMedioEntrega}</p>
+                  <p className="text-xs text-muted-foreground">minutos</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-yellow-500/5 animate-fade-in [animation-delay:300ms]">
+            <CardContent className="pt-6">
+              <div className="space-y-3">
+                <div className="p-3 bg-yellow-500/10 rounded-xl w-fit">
+                  <Star className="w-6 h-6 text-yellow-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Avaliação</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="text-3xl font-bold">{avaliacaoMedia}</p>
+                    <div className="flex">
+                      {[1,2,3,4,5].map((star) => (
+                        <Star 
+                          key={star} 
+                          className={`w-4 h-4 ${star <= Math.floor(avaliacaoMedia) ? 'fill-yellow-500 text-yellow-500' : 'text-muted-foreground'}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Entrega Atual */}
+        {/* Entrega Atual com Design Melhorado */}
         {pedidoAtual && (
-          <Card className="border-primary shadow-lg">
-            <CardHeader>
+          <Card className="border-2 border-primary shadow-2xl bg-gradient-to-br from-card to-primary/5 animate-scale-in">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-transparent border-b">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Navigation className="w-5 h-5 text-primary" />
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <div className="p-2 bg-primary rounded-lg">
+                    <Navigation className="w-5 h-5 text-primary-foreground animate-pulse" />
+                  </div>
                   Entrega em Andamento
                 </CardTitle>
-                <Badge className="bg-primary">{pedidoAtual.numero}</Badge>
+                <Badge className="bg-primary text-lg px-3 py-1">{pedidoAtual.numero}</Badge>
               </div>
+              <CardDescription className="flex items-center gap-2 mt-2">
+                <Clock className="w-4 h-4" />
+                Iniciado às {pedidoAtual.horario}
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm font-medium">Cliente</p>
-                  <p className="text-lg">{pedidoAtual.cliente.nome}</p>
-                  <a
-                    href={`tel:${pedidoAtual.cliente.telefone}`}
-                    className="flex items-center gap-2 text-primary hover:underline mt-1"
-                  >
-                    <Phone className="w-4 h-4" />
-                    {pedidoAtual.cliente.telefone}
-                  </a>
+            <CardContent className="space-y-6 pt-6">
+              <div className="space-y-4">
+                {/* Informações do Cliente - Card Destacado */}
+                <div className="p-4 bg-muted/50 rounded-xl border">
+                  <div className="flex items-start gap-3">
+                    <Avatar className="h-12 w-12 border-2 border-primary/20">
+                      <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                        {pedidoAtual.cliente.nome.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <p className="font-semibold text-lg">{pedidoAtual.cliente.nome}</p>
+                      <a
+                        href={`tel:${pedidoAtual.cliente.telefone}`}
+                        className="flex items-center gap-2 text-primary hover:underline mt-1 font-medium"
+                      >
+                        <Phone className="w-4 h-4" />
+                        {pedidoAtual.cliente.telefone}
+                      </a>
+                    </div>
+                  </div>
                 </div>
 
                 <Separator />
 
-                <div>
-                  <p className="text-sm font-medium mb-2">Endereço de Entrega</p>
-                  <div className="space-y-1 text-sm">
-                    <p>{pedidoAtual.endereco.rua}, {pedidoAtual.endereco.numero}</p>
+                {/* Endereço - Mais Destacado */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-primary" />
+                    <p className="font-semibold text-base">Endereço de Entrega</p>
+                  </div>
+                  <div className="p-4 bg-muted/50 rounded-xl space-y-2">
+                    <p className="font-medium text-base">
+                      {pedidoAtual.endereco.rua}, {pedidoAtual.endereco.numero}
+                    </p>
                     {pedidoAtual.endereco.complemento && (
-                      <p className="text-muted-foreground">{pedidoAtual.endereco.complemento}</p>
-                    )}
-                    <p>{pedidoAtual.endereco.bairro} - {pedidoAtual.endereco.cidade}</p>
-                    {pedidoAtual.endereco.referencia && (
-                      <p className="text-muted-foreground">
-                        <MapPin className="w-3 h-3 inline mr-1" />
-                        {pedidoAtual.endereco.referencia}
+                      <p className="text-sm text-muted-foreground">
+                        {pedidoAtual.endereco.complemento}
                       </p>
+                    )}
+                    <p className="text-sm">
+                      {pedidoAtual.endereco.bairro} - {pedidoAtual.endereco.cidade}
+                    </p>
+                    {pedidoAtual.endereco.referencia && (
+                      <div className="flex items-start gap-2 p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20 mt-2">
+                        <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5" />
+                        <div>
+                          <p className="text-xs font-medium text-yellow-600">Ponto de Referência</p>
+                          <p className="text-sm text-yellow-600/80">{pedidoAtual.endereco.referencia}</p>
+                        </div>
+                      </div>
                     )}
                   </div>
                   <Button
                     onClick={() => abrirGoogleMaps(pedidoAtual.endereco)}
-                    className="w-full mt-3 gap-2"
+                    className="w-full gap-2 h-12 text-base font-semibold"
                     size="lg"
                   >
                     <Navigation className="w-5 h-5" />
@@ -288,123 +434,198 @@ const EntregadorDashboard = () => {
 
                 <Separator />
 
-                <div>
-                  <p className="text-sm font-medium mb-2">Itens do Pedido</p>
-                  <ul className="space-y-1">
-                    {pedidoAtual.itens.map((item, idx) => (
-                      <li key={idx} className="text-sm">
-                        {item.quantidade}x {item.nome}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <Separator />
-
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">Valor Total:</span>
-                  <span className="text-xl font-bold">R$ {pedidoAtual.valor.toFixed(2)}</span>
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium">Forma de Pagamento:</p>
-                  <p className="text-sm text-muted-foreground">{pedidoAtual.pagamento}</p>
-                </div>
-
-                {pedidoAtual.observacoes && (
+                {/* Itens e Valores */}
+                <div className="space-y-4">
                   <div>
-                    <p className="text-sm font-medium">Observações:</p>
-                    <p className="text-sm text-muted-foreground">{pedidoAtual.observacoes}</p>
+                    <p className="font-semibold mb-3 flex items-center gap-2">
+                      <Package className="w-4 h-4 text-primary" />
+                      Itens do Pedido
+                    </p>
+                    <div className="space-y-2">
+                      {pedidoAtual.itens.map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="rounded-full w-6 h-6 flex items-center justify-center p-0">
+                              {item.quantidade}
+                            </Badge>
+                            <span className="font-medium">{item.nome}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                )}
+
+                  <div className="p-4 bg-green-500/10 rounded-xl border border-green-500/20">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-semibold text-base">Valor Total:</span>
+                      <span className="text-2xl font-bold text-green-600">
+                        R$ {pedidoAtual.valor.toFixed(2)}
+                      </span>
+                    </div>
+                    <Separator className="my-2" />
+                    <div>
+                      <p className="text-sm font-medium mb-1">Forma de Pagamento:</p>
+                      <p className="text-sm text-muted-foreground font-medium">
+                        {pedidoAtual.pagamento}
+                      </p>
+                    </div>
+                  </div>
+
+                  {pedidoAtual.observacoes && (
+                    <div className="p-4 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                      <p className="text-sm font-semibold mb-1 text-blue-600">Observações do Cliente:</p>
+                      <p className="text-sm text-blue-600/80">{pedidoAtual.observacoes}</p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <Button
                 onClick={handleMarcarEntregue}
-                className="w-full gap-2"
+                className="w-full gap-2 h-14 text-lg font-bold"
                 size="lg"
               >
-                <CheckCircle2 className="w-5 h-5" />
+                <CheckCircle2 className="w-6 h-6" />
                 Marcar como Entregue
               </Button>
             </CardContent>
           </Card>
         )}
 
-        {/* Tabs */}
+        {/* Tabs Melhorados */}
         <Tabs defaultValue="pendentes" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="pendentes">
+          <TabsList className="grid w-full grid-cols-2 h-12 bg-muted/50">
+            <TabsTrigger value="pendentes" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <Clock className="w-4 h-4" />
               Pendentes ({pedidosPendentes.length})
             </TabsTrigger>
-            <TabsTrigger value="historico">
+            <TabsTrigger value="historico" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <CheckCircle2 className="w-4 h-4" />
               Histórico ({totalEntregasHoje})
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="pendentes" className="space-y-4">
+          <TabsContent value="pendentes" className="space-y-4 animate-fade-in">
             {!pedidoAtual && pedidosPendentes.length === 0 && (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <Clock className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">Nenhuma entrega pendente no momento</p>
+              <Card className="border-none shadow-lg">
+                <CardContent className="py-16 text-center">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="p-6 bg-muted rounded-full">
+                      <Clock className="w-16 h-16 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg">Nenhuma entrega pendente</h3>
+                      <p className="text-muted-foreground mt-1">
+                        Aguardando novos pedidos...
+                      </p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             )}
 
-            {!pedidoAtual && pedidosPendentes.map((pedido) => (
-              <Card key={pedido.id} className="hover:shadow-md transition-shadow">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{pedido.numero}</CardTitle>
-                    <Badge variant="secondary">
-                      <Clock className="w-3 h-3 mr-1" />
+            {!pedidoAtual && pedidosPendentes.map((pedido, index) => (
+              <Card 
+                key={pedido.id} 
+                className="border-none shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 animate-fade-in bg-gradient-to-br from-card to-card/50"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <Badge variant="default" className="text-base px-3 py-1 font-semibold">
+                      {pedido.numero}
+                    </Badge>
+                    <Badge variant="secondary" className="gap-1">
+                      <Clock className="w-3 h-3" />
                       {pedido.horario}
                     </Badge>
                   </div>
-                  <CardDescription>{pedido.cliente.nome}</CardDescription>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <User className="w-4 h-4 text-primary" />
+                    {pedido.cliente.nome}
+                  </CardTitle>
+                  <CardDescription className="flex items-center gap-1 mt-1">
+                    <Phone className="w-3 h-3" />
+                    {pedido.cliente.telefone}
+                  </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="text-sm space-y-1">
-                    <p className="font-medium">
-                      {pedido.endereco.rua}, {pedido.endereco.numero}
-                    </p>
-                    <p className="text-muted-foreground">
-                      {pedido.endereco.bairro} - {pedido.endereco.cidade}
-                    </p>
+                <CardContent className="space-y-4">
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-start gap-2">
+                      <MapPin className="w-4 h-4 text-primary mt-0.5" />
+                      <div className="text-sm space-y-1 flex-1">
+                        <p className="font-semibold">
+                          {pedido.endereco.rua}, {pedido.endereco.numero}
+                        </p>
+                        <p className="text-muted-foreground">
+                          {pedido.endereco.bairro} - {pedido.endereco.cidade}
+                        </p>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-between pt-2">
-                    <span className="font-semibold">R$ {pedido.valor.toFixed(2)}</span>
-                    <Button onClick={() => handleIniciarEntrega(pedido)} size="sm">
-                      Iniciar Entrega
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Package className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">
+                        {pedido.itens.length} {pedido.itens.length === 1 ? 'item' : 'itens'}
+                      </span>
+                    </div>
+                    <span className="text-xl font-bold text-green-600">
+                      R$ {pedido.valor.toFixed(2)}
+                    </span>
                   </div>
+
+                  <Button 
+                    onClick={() => handleIniciarEntrega(pedido)} 
+                    className="w-full gap-2 h-11"
+                    size="lg"
+                  >
+                    <Zap className="w-4 h-4" />
+                    Iniciar Entrega
+                  </Button>
                 </CardContent>
               </Card>
             ))}
           </TabsContent>
 
-          <TabsContent value="historico" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Entregas Realizadas Hoje</CardTitle>
+          <TabsContent value="historico" className="space-y-4 animate-fade-in">
+            <Card className="border-none shadow-lg">
+              <CardHeader className="border-b bg-muted/30">
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-green-600" />
+                  Entregas Realizadas Hoje
+                </CardTitle>
+                <CardDescription>
+                  Total: R$ {totalArrecadadoHoje.toFixed(2)} em {totalEntregasHoje} entregas
+                </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 <div className="space-y-3">
-                  {entregasHoje.map((entrega) => (
+                  {entregasHoje.map((entrega, index) => (
                     <div
                       key={entrega.id}
-                      className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                      className="flex items-center justify-between p-4 bg-muted/30 rounded-xl hover:bg-muted/50 transition-colors animate-fade-in"
+                      style={{ animationDelay: `${index * 50}ms` }}
                     >
-                      <div>
-                        <p className="font-medium">{entrega.numero}</p>
-                        <p className="text-sm text-muted-foreground">{entrega.horario}</p>
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-green-500/10 rounded-lg">
+                          <CheckCircle2 className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div>
+                          <p className="font-semibold">{entrega.numero}</p>
+                          <p className="text-sm text-muted-foreground flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {entrega.horario}
+                          </p>
+                        </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold">R$ {entrega.valor.toFixed(2)}</p>
-                        <Badge variant="default" className="mt-1">
-                          <CheckCircle2 className="w-3 h-3 mr-1" />
+                        <p className="font-bold text-green-600 text-lg">
+                          R$ {entrega.valor.toFixed(2)}
+                        </p>
+                        <Badge variant="default" className="mt-1 bg-green-600 gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
                           Entregue
                         </Badge>
                       </div>
